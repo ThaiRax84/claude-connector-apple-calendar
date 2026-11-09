@@ -1,0 +1,37 @@
+{
+  "name": "claude-connector-apple-calendar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP server that lets Claude read and write your Apple Calendar (iCloud) via CalDAV",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "claude-connector-apple-calendar": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThaiRax84/claude-connector-apple-calendar.git"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "apple-calendar",
+    "icloud",
+    "caldav"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "luxon": "^3.7.2",
+    "node-ical": "^0.27.6",
+    "tsdav": "^2.5.0",
+    "zod": "^4.6.7"
+  }
+}

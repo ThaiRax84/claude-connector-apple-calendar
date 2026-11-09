@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "apple-calendar": {
+      "command": "node",
+      "args": ["C:\\Users\\YOUR_USER\\claude-connector-apple-calendar\\src\\index.js"],
+      "env": {
+        "ICLOUD_USERNAME": "your-apple-id@example.com",
+        "ICLOUD_APP_PASSWORD": "xxxx-xxxx-xxxx-xxxx",
+        "TZ_NAME": "America/Mexico_City"
+      }
+    }
+  }
+}

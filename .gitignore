@@ -1,0 +1,6 @@
+node_modules/
+.env
+.env.*
+claude_desktop_config.json
+*.log
+.DS_Store
