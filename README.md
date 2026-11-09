@@ -20,7 +20,7 @@ The server talks to `caldav.icloud.com`, the same CalDAV service Apple devices s
 | `list_calendars` | Lists your iCloud event calendars |
 | `list_events` | Events between two dates, recurring events expanded |
 | `find_free_slots` | Free slots of N minutes inside a daily window (default 07:00–22:00) |
-| `add_event` | Creates an event with optional notes, location and alert |
+| `add_event` | Creates an event with optional notes, location, alert and repetition (RRULE, e.g. every weekday) |
 | `delete_event` | Permanently deletes an event (Claude is told to confirm first) |
 
 ## Setup
@@ -67,6 +67,7 @@ Found a vulnerability? Please open a private security advisory on GitHub instead
 
 - Works only while the Claude desktop app is running on the computer where the server is installed.
 - The Reminders app is not available: Apple stopped exposing Reminders over CalDAV in iOS 13. Use events with alerts instead.
+- Recurring events are created in local time (`TZ_NAME`). For zones with daylight saving time, the server relies on iCloud resolving the IANA zone name.
 - All-day events (birthdays, holidays) are not counted as busy when searching for free time.
 
 ## Project structure

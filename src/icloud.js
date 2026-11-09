@@ -77,11 +77,13 @@ export async function listEvents({ start, end, calendars }) {
   return out.sort((a, b) => a.start - b.start);
 }
 
-export async function addEvent({ calendar, title, start, end, notes, location, alarmMinutesBefore }) {
+export async function addEvent({ calendar, title, start, end, notes, location, alarmMinutesBefore, recurrence, zone }) {
   const client = await getClient();
   const { from, to } = parseRange(start, end);
   const [cal] = await pickCalendars([calendar]);
-  const { uid, ics } = buildEvent({ title, start: from, end: to, notes, location, alarmMinutesBefore });
+  const { uid, ics } = buildEvent({
+    title, start: from, end: to, notes, location, alarmMinutesBefore, recurrence, zone,
+  });
   const filename = `${uid.split("@")[0]}.ics`; // plain UUID: safe in any URL path
   const res = await client.createCalendarObject({ calendar: cal.raw, filename, iCalString: ics });
   if (!res.ok) throw new Error(`iCloud rejected the event (HTTP ${res.status}).`);

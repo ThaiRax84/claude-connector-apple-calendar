@@ -6,6 +6,7 @@ import { z } from "zod";
 import { DateTime } from "luxon";
 import { listCalendars, listEvents, addEvent, deleteEvent } from "./icloud.js";
 import { findFreeSlots } from "./freeSlots.js";
+import { RRULE_PATTERN } from "./ics.js";
 
 const ZONE = process.env.TZ_NAME || "America/Mexico_City";
 if (!DateTime.now().setZone(ZONE).isValid) {
@@ -13,7 +14,7 @@ if (!DateTime.now().setZone(ZONE).isValid) {
   process.exit(1);
 }
 
-const server = new McpServer({ name: "apple-calendar", version: "0.1.0" });
+const server = new McpServer({ name: "apple-calendar", version: "0.2.0" });
 
 const local = (d) => DateTime.fromJSDate(new Date(d), { zone: ZONE }).toISO({ suppressMilliseconds: true });
 const ok = (data) => ({ content: [{ type: "text", text: JSON.stringify(data, null, 2) }] });
@@ -101,9 +102,18 @@ server.registerTool(
       notes: z.string().max(10_000).optional(),
       location: z.string().max(500).optional(),
       alarm_minutes_before: z.number().int().min(0).max(40_320).optional(),
+      recurrence: z
+        .string()
+        .max(300)
+        .regex(RRULE_PATTERN)
+        .optional()
+        .describe(
+          "Optional RRULE to repeat the event, e.g. FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR or " +
+            "FREQ=WEEKLY;BYDAY=MO,WE;UNTIL=20270508T235959Z. start/end describe the first occurrence."
+        ),
     },
   },
-  wrap(async (a) => addEvent({ ...a, alarmMinutesBefore: a.alarm_minutes_before }))
+  wrap(async (a) => addEvent({ ...a, alarmMinutesBefore: a.alarm_minutes_before, zone: ZONE }))
 );
 
 server.registerTool(

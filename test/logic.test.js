@@ -118,3 +118,33 @@ test("delete only accepts event URLs inside the user's own iCloud calendars", ()
     assert.throws(() => assertOwnedEventUrl(bad, mine), /Refused|Invalid/, bad);
   }
 });
+
+test("recurring event round-trips: weekdays at 12:00 local, cancelled-date aware", () => {
+  const { ics } = buildEvent({
+    title: "Work",
+    start: d("2026-11-09T12:00:00-06:00"),
+    end: d("2026-11-09T15:00:00-06:00"),
+    recurrence: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+    zone: "America/Mexico_City",
+  });
+  assert.match(ics, /DTSTART;TZID=America\/Mexico_City:20261109T120000/);
+  assert.match(ics, /BEGIN:VTIMEZONE[\s\S]*TZOFFSETTO:-0600/);
+  const occ = expandEvents(ics, d("2026-11-09T00:00:00-06:00"), d("2026-11-16T00:00:00-06:00"));
+  assert.equal(occ.length, 5);
+  assert.ok(occ.every((o) => o.start.getUTCHours() === 18 && o.end - o.start === 3 * 3600_000));
+});
+
+test("recurrence rules that try to inject properties are rejected", () => {
+  for (const bad of [
+    "FREQ=WEEKLY\r\nATTENDEE:mailto:x@example.com",
+    "FREQ=WEEKLY;BYDAY=MO\nX-INJECT:1",
+    "BYDAY=MO", // no FREQ
+    "FREQ=SECONDLY", // not allowed
+  ]) {
+    assert.throws(
+      () => buildEvent({ title: "x", start: d("2026-11-09T12:00:00Z"), end: d("2026-11-09T13:00:00Z"), recurrence: bad }),
+      /Invalid recurrence/,
+      JSON.stringify(bad)
+    );
+  }
+});
